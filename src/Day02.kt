@@ -1,45 +1,45 @@
 fun main() {
+    fun parse(value: String): Move {
+        return when (value) {
+            "A", "X" -> Move.ROCK____
+            "B", "Y" -> Move.PAPER___
+            "C", "Z" -> Move.SCISSORS
+            else -> error("Err: $value")
+        }
+    }
+
+    fun parseDesiredResult(value: String) = when (value) {
+        "X" -> Result.LOSS
+        "Y" -> Result.DRAW
+        "Z" -> Result.WIN_
+        else -> error("Err: $value")
+    }
+
     fun part1(input: List<String>) = input.fold(0) { total, entry ->
         val entries = entry.split(" ")
         val opponent = parse(entries[0])
         val mine = parse(entries[1])
-        total + mine.play(opponent).value + mine.value
+        total + mine.play(opponent).score + mine.score
     }
 
     fun part2(input: List<String>) = input.fold(0) { total, entry ->
         val entries = entry.split(" ")
         val opponent = parse(entries[0])
         val mine = opponent.moveForResult(parseDesiredResult(entries[1]))
-        total + mine.play(opponent).value + mine.value
+        total + mine.play(opponent).score + mine.score
     }
-
-// test if implementation meets criteria from the description, like:
-    val testInput = readInput("input/Day02_test")
-    println(part2(testInput))
-    check(part2(testInput) == 12)
 
     val input = readInput("input/Day02")
     println(part1(input))
     println(part2(input))
 }
 
-private fun parse(value: String): Move {
-    return when (value) {
-        "A", "X" -> Move.ROCK____
-        "B", "Y" -> Move.PAPER___
-        "C", "Z" -> Move.SCISSORS
-        else -> error("Err: $value")
-    }
+enum class Result(val score: Int) {
+    LOSS(0),
+    DRAW(3),
+    WIN_(6),
 }
-
-fun parseDesiredResult(value: String) = when (value) {
-    "X" -> Result.LOSS
-    "Y" -> Result.DRAW
-    "Z" -> Result.WIN_
-    else -> error("Err: $value")
-}
-
-enum class Move(val value: Int) {
+enum class Move(val score: Int) {
     ROCK____(1),
     PAPER___(2),
     SCISSORS(3);
@@ -59,7 +59,6 @@ enum class Move(val value: Int) {
             PAPER___ -> ROCK____
             SCISSORS -> PAPER___
         }
-
         Result.DRAW -> this
         Result.WIN_ -> when (this) {
             ROCK____ -> PAPER___
@@ -67,11 +66,4 @@ enum class Move(val value: Int) {
             SCISSORS -> ROCK____
         }
     }
-
-}
-
-enum class Result(val value: Int) {
-    LOSS(0),
-    DRAW(3),
-    WIN_(6),
 }
