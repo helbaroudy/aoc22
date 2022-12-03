@@ -1,17 +1,23 @@
+import java.util.Scanner
+
 fun main() {
-    fun part1(input: List<String>): Int {
-        return input.size
+    // Execute, and copy paste the test input
+    val list: MutableList<Int> = ArrayList()
+    val sc = Scanner(System.`in`)
+    var currentCalories = 0
+
+    while (sc.hasNext()) {
+        val current = sc.nextLine()
+        val num = current.toIntOrNull()
+        num?.let { currentCalories += it } ?: run {
+            list += currentCalories
+            currentCalories = 0
+        }
+
     }
+    list.sortByDescending { it }
 
-    fun part2(input: List<String>): Int {
-        return input.size
-    }
-
-    // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
-
-    val input = readInput("Day01")
-    println(part1(input))
-    println(part2(input))
+    println("1: ${list[0]}")
+    val result = list[0] + list[1] + list[2]
+    println("2: $result")
 }
