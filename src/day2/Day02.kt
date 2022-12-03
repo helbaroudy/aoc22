@@ -33,7 +33,7 @@ fun main() {
         total + mine.play(opponent).score + mine.score
     }
 
-    val input = readInput("input/Day02")
+    val input = readInput("Day02")
     println(part1(input))
     println(part2(input))
 }

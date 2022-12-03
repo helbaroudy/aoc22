@@ -43,7 +43,7 @@ fun main() {
 
     fun part2(input: List<String>): Int {
         var total = 0
-        for (i in 0 until input.size step 3) {
+        for (i in input.indices step 3) {
             val badgeType = getBadgeType(input.get(i), input.get(i + 1), input.get(i + 2))
             total += getPriorityValue(badgeType)
             println(badgeType)
@@ -53,12 +53,12 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("input/Day03_test")
+    val testInput = readInput("Day03_test")
     //part1(testInput)
     check(part1(testInput) == 157)
     check(part2(testInput) == 70)
 
-    val input = readInput("input/Day03")
+    val input = readInput("Day03")
     println(part1(input))
     println(part2(input))
 }
