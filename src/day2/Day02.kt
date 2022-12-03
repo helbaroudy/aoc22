@@ -1,3 +1,7 @@
+package day2
+
+import readInput
+
 fun main() {
     fun parse(value: String): Move {
         return when (value) {

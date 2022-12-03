@@ -1,3 +1,7 @@
+package day3
+
+import readInput
+
 fun main() {
     fun getType(compartment1: String, compartment2: String): Char {
         var solution = ' '
