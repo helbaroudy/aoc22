@@ -1,71 +1,76 @@
 package day5
 
 import readInput
-import java.util.LinkedList
+
+fun parseInput(input: List<String>): Pair<MutableList<String>, MutableList<Movement>> {
+    val instructions = mutableListOf<Movement>()
+    val stacks = MutableList((input[0].length + 1) / 4) { "" }
+    for (entry in input) {
+        if (entry.isNotEmpty() && !entry.startsWith("move")) {
+            parseStacks(entry, stacks)
+        } else if (entry.isNotEmpty()) {
+            instructions.add(entry.parseMovement())
+        }
+    }
+    return Pair(stacks, instructions)
+}
+
+private fun parseStacks(entry: String, stacks: MutableList<String>) {
+    for ((current, i) in (1..entry.length step 4).withIndex()) {
+        if (entry[i] != ' ' && !entry[i].isDigit()) {
+            stacks[current] = stacks[current] + entry[i]
+        }
+    }
+}
 
 fun main() {
-    fun part1(input: List<String>): String {
-        val rawStacks = mutableListOf<String>()
-        val instructions = mutableListOf<Movement>()
-        val stacks = MutableList<LinkedList<Char>>((input[0].length + 1) / 4) { LinkedList() }
-        for (entry in input) {
-            if (!entry.startsWith("move") && (entry.isNotEmpty())) {
-                rawStacks.add(entry)
-                for ((current, i) in (1..entry.length step 4).withIndex()) {
-                    if (entry[i] != ' ') stacks[current].add(entry[i])
-                }
-            } else if (entry.isNotEmpty()) instructions.add(entry.parseMovement())
+    fun moveOne(stacks: MutableList<String>, fromIndex: Int, toIndex: Int) {
+        if (stacks[fromIndex].isNotEmpty()) {
+            stacks[toIndex] = stacks[fromIndex][0] + stacks[toIndex]
+            stacks[fromIndex] = stacks[fromIndex].removeRange(0, 1)
         }
+    }
 
+    fun moveMultiple(
+        stacks: MutableList<String>,
+        quantity: Int,
+        toIndex: Int,
+        fromIndex: Int,
+    ) {
+        stacks[toIndex] = stacks[fromIndex].substring(0, quantity) + stacks[toIndex]
+        stacks[fromIndex] = stacks[fromIndex].removeRange(0, quantity)
+    }
+
+    fun applyInstructions(
+        stacks: MutableList<String>,
+        instructions: List<Movement>,
+        batched: Boolean,
+    ) {
         for (instruction in instructions) {
-            for (i in 0.until(instruction.quantity)) {
-                if (stacks[instruction.from - 1].isNotEmpty()) {
-                    val element = stacks[instruction.from - 1].element()
-                    stacks[instruction.to - 1].addFirst(element)
-                    stacks[instruction.from - 1].remove()
+            val fromIndex = instruction.from - 1
+            val toIndex = instruction.to - 1
+            if (batched) {
+                moveMultiple(stacks, instruction.quantity, toIndex, fromIndex)
+            } else {
+                for (i in 0.until(instruction.quantity)) {
+                    moveOne(stacks, fromIndex, toIndex)
                 }
             }
         }
-
-        var result = ""
-        for (stack in stacks) {
-            result += stack[0]
-        }
-        return result
     }
 
+
+    fun part1(input: List<String>): String {
+        val (stacks, instructions) = parseInput(input)
+        applyInstructions(stacks, instructions, false)
+        return stacks.fold("") { result, stack -> result + stack[0] }
+    }
+
+
     fun part2(input: List<String>): String {
-        val rawStacks = mutableListOf<String>()
-        val instructions = mutableListOf<Movement>()
-        val stacks = MutableList<String>((input[0].length + 1) / 4) { "" }
-        for (entry in input) {
-            if (!entry.startsWith("move") && (entry.isNotEmpty())) {
-                rawStacks.add(entry)
-                var current = 0
-                for (i in 1..entry.length step 4) {
-                    if (entry[i] != ' ' && !entry[i].isDigit()) stacks[current] = stacks[current] + (entry[i])
-                    current++
-                }
-            } else if (entry.isNotEmpty()) instructions.add(entry.parseMovement())
-        }
-
-
-        for (instruction in instructions) {
-
-            val fromIndex = instruction.from - 1
-            val toIndex = instruction.to - 1
-
-            val element = stacks[fromIndex].substring(0, instruction.quantity)
-            stacks[toIndex] = element + stacks[toIndex]
-            stacks[fromIndex] = stacks[fromIndex].removeRange(0, instruction.quantity)
-
-        }
-
-        var result = ""
-        for (stack in stacks) {
-            result += stack[0]
-        }
-        return result
+        val (stacks, instructions) = parseInput(input)
+        applyInstructions(stacks, instructions, true)
+        return stacks.fold("") { result, stack -> result + stack[0] }
     }
 
     val testInput = readInput("Day05_test")
@@ -77,6 +82,8 @@ fun main() {
     //part1(input)
     println("Part 1: ${part1(input)}")
     println("Part 2: ${part2(input)}")
+    check(part1(input) == "SPFMVDTZT")
+    check(part2(input) == "ZFSJBPRFP")
 
 }
 
