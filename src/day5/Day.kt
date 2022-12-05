@@ -1,8 +1,6 @@
 package day5
 
 import readInput
-import java.util.Queue
-import java.util.ArrayDeque
 import java.util.LinkedList
 
 fun main() {
@@ -19,9 +17,7 @@ fun main() {
             } else if (entry.isNotEmpty()) instructions.add(entry.parseMovement())
         }
 
-
         for (instruction in instructions) {
-
             for (i in 0.until(instruction.quantity)) {
                 if (stacks[instruction.from - 1].isNotEmpty()) {
                     val element = stacks[instruction.from - 1].element()
@@ -39,18 +35,48 @@ fun main() {
     }
 
     fun part2(input: List<String>): String {
-        return "---"
+        val rawStacks = mutableListOf<String>()
+        val instructions = mutableListOf<Movement>()
+        val stacks = MutableList<String>((input[0].length + 1) / 4) { "" }
+        for (entry in input) {
+            if (!entry.startsWith("move") && (entry.isNotEmpty())) {
+                rawStacks.add(entry)
+                var current = 0
+                for (i in 1..entry.length step 4) {
+                    if (entry[i] != ' ' && !entry[i].isDigit()) stacks[current] = stacks[current] + (entry[i])
+                    current++
+                }
+            } else if (entry.isNotEmpty()) instructions.add(entry.parseMovement())
+        }
+
+
+        for (instruction in instructions) {
+
+            val fromIndex = instruction.from - 1
+            val toIndex = instruction.to - 1
+
+            val element = stacks[fromIndex].substring(0, instruction.quantity)
+            stacks[toIndex] = element + stacks[toIndex]
+            stacks[fromIndex] = stacks[fromIndex].removeRange(0, instruction.quantity)
+
+        }
+
+        var result = ""
+        for (stack in stacks) {
+            result += stack[0]
+        }
+        return result
     }
 
     val testInput = readInput("Day05_test")
     part1(testInput)
-     check(part1(testInput) == "CMZ")
-   //  check(part2(testInput) == "MCD")
+    check(part1(testInput) == "CMZ")
+    check(part2(testInput) == "MCD")
 
     val input = readInput("Day05")
     //part1(input)
     println("Part 1: ${part1(input)}")
-    //  println("Part 2: ${part2(input)}")
+    println("Part 2: ${part2(input)}")
 
 }
 
